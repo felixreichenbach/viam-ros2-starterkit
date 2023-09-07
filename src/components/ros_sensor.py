@@ -5,11 +5,10 @@ from ros2.viam_ros_node import Node
 from rclpy.subscription import Subscription
 # Viam Imports
 from viam.components.sensor import Sensor
-from viam.module.module import Module
+from viam.module.types import Reconfigurable
 from viam.proto.app.robot import ComponentConfig
 from viam.proto.common import ResourceName
 from viam.resource.base import ResourceBase
-from viam.resource.registry import Registry, ResourceCreatorRegistration
 from viam.resource.types import Model, ModelFamily
 from viam.utils import ValueTypes
 from viam.logging import getLogger
@@ -23,7 +22,7 @@ LOGGER = getLogger(__name__)
 # LOGGER.debug(f"Task {task.get_name()} returned with result {result}")
 
 
-class ROSSensor(Sensor):
+class ROSSensor(Sensor, Reconfigurable):
     # Subclass the Viam Sensor component and implement the required functions
     MODEL: ClassVar[Model] = Model(
         ModelFamily("viamlabs", "ros2"), "rossensor")

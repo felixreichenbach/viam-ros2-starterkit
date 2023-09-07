@@ -42,3 +42,15 @@ To be able to install viam-server the following package is required:
 ```
 sudo apt install libfuse2
 ```
+
+## Viam ROS2 Module Configuration
+
+```
+  "modules": [
+    {
+      "name": "starter-kit",
+      "executable_path": "/home/ubuntu/viam-ros2-starterkit/run.sh",
+      "type": "local"
+    }
+  ]
+  ```

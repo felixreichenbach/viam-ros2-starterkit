@@ -10,8 +10,13 @@ cd `dirname $0`
 VENV_NAME="venv"
 PYTHON="$VENV_NAME/bin/python"
 
-python3 -m venv $VENV_NAME
+python3 -m venv --system-site-packages $VENV_NAME
 $PYTHON -m pip install -r requirements.txt -U # remove -U if viam-sdk should not be upgraded whenever possible
+
+
+# export underlay & add overlays as needed
+# . /etc/turtlebot4/setup.sh
+. /opt/ros/humble/setup.sh
 
 # Be sure to use `exec` so that termination signals reach the python process,
 # or handle forwarding termination signals manually

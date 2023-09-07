@@ -6,7 +6,7 @@ cd `dirname $0`
 VENV_NAME="venv"
 PYTHON="$VENV_NAME/bin/python"
 
-python3 -m venv --system-site-packages $VENV_NAME
+python3 -m venv $VENV_NAME
 $PYTHON -m pip install -r requirements.txt -U # remove -U if viam-sdk should not be upgraded whenever possible
 
 

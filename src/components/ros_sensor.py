@@ -1,7 +1,7 @@
 from typing import Any, ClassVar, Dict, Mapping, Optional, Sequence
 from typing_extensions import Self
 # ROS 2 Imports
-from rclpy.node import Node
+from ros2.viam_ros_node import Node
 from rclpy.subscription import Subscription
 # Viam Imports
 from viam.components.sensor import Sensor

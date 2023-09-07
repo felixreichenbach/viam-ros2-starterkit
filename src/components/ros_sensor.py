@@ -44,6 +44,7 @@ class ROSSensor(Sensor, Reconfigurable):
         sensor = cls(config.name)
         cls.temperature = 999
         cls.ros_node = None
+        sensor.reconfigure(config, dependencies)
         return sensor
 
     # Validates component configuration parameters

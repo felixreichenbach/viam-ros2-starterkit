@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 import rclpy
 from rclpy.node import Node
-
-#from example_interfaces.msg import Int64
 from sensor_msgs.msg import Temperature
 import random
 
@@ -15,7 +13,7 @@ class TemperatureSensorNode(Node):
             2.0, self.publish_temperature)
 
     def publish_temperature(self):
-        temperature = 2.0
+        temperature = random.uniform(-20, 100)
         msg = Temperature()
         msg.temperature = temperature
         self.temperature_publisher_.publish(msg)

@@ -13,7 +13,7 @@ from viam.resource.types import Model, ModelFamily
 from viam.utils import ValueTypes
 from viam.logging import getLogger
 
-from ros2.viam_ros_node import ViamRosNode
+#from ros2.viam_ros_node import ViamRosNode
 from rclpy.node import Node
 from rclpy.subscription import Subscription
 

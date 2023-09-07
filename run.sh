@@ -1,9 +1,5 @@
 #!/bin/bash
 
-: '
-To be revieved and updated with https://github.com/shawnbmccarthy/viam-ros2-module/blob/blog/run.sh
-'
-
 cd `dirname $0`
 
 # Create a virtual environment to run our code

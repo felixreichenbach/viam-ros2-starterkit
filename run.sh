@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 : '
 To be revieved and updated with https://github.com/shawnbmccarthy/viam-ros2-module/blob/blog/run.sh
@@ -15,8 +15,8 @@ $PYTHON -m pip install -r requirements.txt -U # remove -U if viam-sdk should not
 
 
 # export underlay & add overlays as needed
-# . /etc/turtlebot4/setup.sh
-. /opt/ros/humble/setup.sh
+. /etc/turtlebot4/setup.bash
+. /opt/ros/humble/setup.bash
 
 # Be sure to use `exec` so that termination signals reach the python process,
 # or handle forwarding termination signals manually

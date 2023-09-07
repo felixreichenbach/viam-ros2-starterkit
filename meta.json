@@ -2,11 +2,11 @@
   "module_id": "felix-home-registry:viamlabs-ros2-starterkit",
   "visibility": "private",
   "url": "https://github.com/felixreichenbach/viam-ros2-starterkit",
-  "description": "",
+  "description": "A simple ROS2 integration framework to help you build ROS2 integrations faster.",
   "models": [
     {
       "api": "rdk:component:sensor",
-      "model": "viamlabs:ros2:rossensor"
+      "model": "felix-home-registry:ros2:rossensor"
     }
   ],
   "entrypoint": "run.sh"

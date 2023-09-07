@@ -25,7 +25,7 @@ LOGGER = getLogger(__name__)
 class ROSSensor(Sensor, Reconfigurable):
     # Subclass the Viam Sensor component and implement the required functions
     MODEL: ClassVar[Model] = Model(
-        ModelFamily("viamlabs", "ros2"), "rossensor")
+        ModelFamily("felix-home-registry", "ros2"), "rossensor")
 
     # Sensor attributes
     ros_topic: str  # The ROS topic to subscribe to provided through component configuration

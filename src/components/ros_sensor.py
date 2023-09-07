@@ -2,9 +2,11 @@ from typing import Any, ClassVar, Dict, Mapping, Optional, Sequence
 from typing_extensions import Self
 # ROS 2 Imports
 from ros2.viam_ros_node import Node
+from rclpy.qos import qos_profile_sensor_data
 from rclpy.subscription import Subscription
 # Viam Imports
 from viam.components.sensor import Sensor
+from viam.resource.registry import Registry, ResourceCreatorRegistration
 from viam.module.types import Reconfigurable
 from viam.proto.app.robot import ComponentConfig
 from viam.proto.common import ResourceName
@@ -19,8 +21,6 @@ from ros2.viam_ros_node import ViamRosNode
 from sensor_msgs.msg import Temperature
 
 LOGGER = getLogger(__name__)
-# LOGGER.debug(f"Task {task.get_name()} returned with result {result}")
-
 
 class ROSSensor(Sensor, Reconfigurable):
     # Subclass the Viam Sensor component and implement the required functions
@@ -31,7 +31,6 @@ class ROSSensor(Sensor, Reconfigurable):
     ros_topic: str  # The ROS topic to subscribe to provided through component configuration
     ros_node: Node
     subscription: Subscription
-
     temperature: float  # A temperature in our example
 
     def __init__(self, name: str):
@@ -43,6 +42,8 @@ class ROSSensor(Sensor, Reconfigurable):
         cls, config: ComponentConfig, dependencies: Mapping[ResourceName, ResourceBase]
     ) -> Self:
         sensor = cls(config.name)
+        cls.temperature = 999
+        cls.ros_node = None
         return sensor
 
     # Validates component configuration parameters
@@ -52,7 +53,7 @@ class ROSSensor(Sensor, Reconfigurable):
             cls.ros_topic = config.attributes.fields["ros_topic"].string_value
         else:
             raise Exception('Attribute "ros_topic" is mandatory!')
-        return [""]
+        return []
 
     # Applies configuration changes to a component instance
     def reconfigure(
@@ -66,12 +67,13 @@ class ROSSensor(Sensor, Reconfigurable):
             self.ros_node = ViamRosNode.get_viam_ros_node()
 
         self.subscription = self.ros_node.create_subscription(
-            Temperature, self.ros_topic, self.subscriber_callback)
-        LOGGER.debug(f"Reconfigure executed!")
+            Temperature, self.ros_topic, self.subscriber_callback, qos_profile_sensor_data)
+        LOGGER.info(f"Reconfigure executed {self.subscription}!")
 
     # Processes ROS 2 Temperature messages
     def subscriber_callback(self, temperature_msg: Temperature) -> None:
         self.temperature = temperature_msg.temperature
+        LOGGER.info("CALLBACK")
 
     """
     Viam standard Sensor class methods to be implemented
@@ -92,3 +94,8 @@ class ROSSensor(Sensor, Reconfigurable):
         **kwargs
     ) -> Mapping[str, ValueTypes]:
         return command
+
+
+# Register the model with the viam server
+Registry.register_resource_creator(Sensor.SUBTYPE, ROSSensor.MODEL, ResourceCreatorRegistration(
+    ROSSensor.new, ROSSensor.validate_config))

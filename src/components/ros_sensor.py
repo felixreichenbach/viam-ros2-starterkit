@@ -1,8 +1,9 @@
-import asyncio
 from typing import Any, ClassVar, Dict, Mapping, Optional, Sequence
-
 from typing_extensions import Self
-
+# ROS 2 Imports
+from rclpy.node import Node
+from rclpy.subscription import Subscription
+# Viam Imports
 from viam.components.sensor import Sensor
 from viam.module.module import Module
 from viam.proto.app.robot import ComponentConfig
@@ -12,29 +13,32 @@ from viam.resource.registry import Registry, ResourceCreatorRegistration
 from viam.resource.types import Model, ModelFamily
 from viam.utils import ValueTypes
 from viam.logging import getLogger
+# Custom Code Imports
+from ros2.viam_ros_node import ViamRosNode
 
-#from ros2.viam_ros_node import ViamRosNode
-from rclpy.node import Node
-from rclpy.subscription import Subscription
+# Import ROS2 message type https://docs.ros2.org/latest/api/sensor_msgs/index-msg.html
+from sensor_msgs.msg import Temperature
 
-# Import ROS2 message type
-# e.g. from sensor_msgs.msg import Imu
+LOGGER = getLogger(__name__)
+# LOGGER.debug(f"Task {task.get_name()} returned with result {result}")
 
-LOGGER = getLogger(__name__) 
-#LOGGER.debug(f"Task {task.get_name()} returned with result {result}")
 
 class ROSSensor(Sensor):
     # Subclass the Viam Sensor component and implement the required functions
-    MODEL: ClassVar[Model] = Model(ModelFamily("viamlabs", "ros2"), "rossensor")
-    multiplier: float
+    MODEL: ClassVar[Model] = Model(
+        ModelFamily("viamlabs", "ros2"), "rossensor")
 
-    ros_topic: str
+    # Sensor attributes
+    ros_topic: str  # The ROS topic to subscribe to provided through component configuration
     ros_node: Node
+    subscription: Subscription
 
+    temperature: float  # A temperature in our example
 
     def __init__(self, name: str):
         super().__init__(name)
 
+    # Creates a new sensor instance
     @classmethod
     def new(
         cls, config: ComponentConfig, dependencies: Mapping[ResourceName, ResourceBase]
@@ -42,32 +46,45 @@ class ROSSensor(Sensor):
         sensor = cls(config.name)
         return sensor
 
+    # Validates component configuration parameters
     @classmethod
     def validate_config(cls, config: ComponentConfig) -> Sequence[str]:
-        if "multiplier" in config.attributes.fields:
-            if not isinstance(config.attributes.fields["multiplier"], float):
-                raise Exception("Multiplier must be a float.")
-            cls.multiplier = config.attributes.fields["multiplier"].number_value
-            if cls.multiplier == 0:
-                raise Exception("Multiplier cannot be 0.")
+        if "ros_topic" in config.attributes.fields:
+            cls.ros_topic = config.attributes.fields["ros_topic"].string_value
         else:
-            cls.multiplier = 1.0
+            raise Exception('Attribute "ros_topic" is mandatory!')
         return [""]
 
+    # Applies configuration changes to a component instance
     def reconfigure(
         self, config: ComponentConfig, dependencies: Mapping[ResourceName, ResourceBase]
     ):
-        self.multiplier = config.attributes.fields["multiplier"].number_value
+        self.ros_topic = config.attributes.fields["ros_topic"].string_value
+        if self.ros_node is not None:
+            if self.subscription is not None:
+                self.ros_node.destroy_subscription(self.subscription)
+        else:
+            self.ros_node = ViamRosNode.get_viam_ros_node()
+
+        self.subscription = self.ros_node.create_subscription(
+            Temperature, self.ros_topic, self.subscriber_callback)
+        LOGGER.debug(f"Reconfigure executed!")
+
+    # Processes ROS 2 Temperature messages
+    def subscriber_callback(self, temperature_msg: Temperature) -> None:
+        self.temperature = temperature_msg.temperature
 
     """
     Viam standard Sensor class methods to be implemented
     """
 
+    # Mandatory: Viam standard sensor API to return sensor reading
     async def get_readings(
         self, extra: Optional[Dict[str, Any]] = None, **kwargs
     ) -> Mapping[str, Any]:
-        return {"signal": 1 * self.multiplier}
+        return {"temperature": self.temperature}
 
+    # Optional: An easy way to add additonal functionality to a sensor component through the Viam standard API
     async def do_command(
         self,
         command: Mapping[str, ValueTypes],

@@ -73,7 +73,6 @@ class ROSSensor(Sensor, Reconfigurable):
     # Processes ROS 2 Temperature messages
     def subscriber_callback(self, temperature_msg: Temperature) -> None:
         self.temperature = temperature_msg.temperature
-        LOGGER.info("CALLBACK")
 
     """
     Viam standard Sensor class methods to be implemented

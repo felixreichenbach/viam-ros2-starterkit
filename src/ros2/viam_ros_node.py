@@ -1,5 +1,5 @@
 from rclpy.node import Node
-from utils import RclpyNodeManager
+from ros2 import RclpyNodeManager
 
 class ViamRosNode(Node):
     """

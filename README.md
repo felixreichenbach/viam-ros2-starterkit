@@ -35,3 +35,10 @@ In .vscode/settings.json
     ]
 }
 ```
+
+## Ubuntu 22.04 Setup
+
+To be able to install viam-server the following package is required:
+```
+sudo apt install libfuse2
+```
